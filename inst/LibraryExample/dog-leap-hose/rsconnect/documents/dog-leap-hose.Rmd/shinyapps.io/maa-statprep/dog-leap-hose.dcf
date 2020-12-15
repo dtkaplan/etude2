@@ -1,0 +1,12 @@
+name: dog-leap-hose
+title: dog-leap-hose
+username:
+account: maa-statprep
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3405214
+bundleId: 3994078
+url: https://maa-statprep.shinyapps.io/dog-leap-hose/
+when: 1608071813.80905
+asMultiple: FALSE
+asStatic: FALSE

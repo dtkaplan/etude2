@@ -10,15 +10,37 @@ params:
 knitr::opts_chunk$set(echo = FALSE)
 learnr::tutorial_options(exercise.timelimit = 60, 
                  exercise.checker = gradethis::grade_learnr)
-etude2::master_id("DD22")
-etude2::etude_document_name("DD22")
 ```
-
 ```{r context="setup", include=FALSE}
-library(etude2)
+### Boilerplate: always include these packages
 library(learnr)
 library(gradethis)
+library(etude2)
 ```
+
+```{r context="setup", include=FALSE, eval=FALSE}
+# Good practice to include these in any document bringing
+# with the answer submission system
+etude2::master_id("DD22")
+etude2::etude_document_name("DD22")
+# This can only be constructed after the document is complete
+# You can get the names from the first column of the submission
+# table (after you have made an entry for each item)
+# The purpose here is to show the student a complete list of all
+# of the questions in the document, so they can see at a glance what
+# they are missing.
+# If this isn't here, the submission table will not include 
+# questions for which no answers has been submitted.
+document_roster <- tibble::tribble(
+  ~ id,
+"DD22-3-aquiz", "DD22-4-bquiz", "DD22-1-first-question",
+"DD22-2-from_etude", "DD22-5-multiple", "DD22-6-multiple2",
+"ex1","ex3"
+)
+```
+
+
+
 
 ## Exercises
 
@@ -89,22 +111,22 @@ etudeQ("Which ones are vowels?",
 
 ## Hand in
 
-```{r}
-etude2::master_id_list()
-```
+This is the answer submission logic
 
 
 ```{r context="server"}
 current_state <- shiny::eventReactive(input$get_state, {
   All <- learnr:::get_objects(session)
   objs = learnr:::get_all_state_objects(session)
-  
   objs = learnr:::submissions_from_state_objects(objs)
+  
   return(objs)
 })
 current_state_report <- reactive({
-  shiny_object_names <- tibble(id = etude2::master_id_list())
-  For_report <- lapply(current_state(), function(item) {
+  #shiny_object_names <- tibble(id = etude2::master_id_list())
+  state_objs <- current_state()
+  if (length(state_objs) == 0) return(tibble(message="No submissions yet"))
+  condense <- function(item) {
     if (item$type == "exercise_submission") {
       tibble::tibble(id = item$id, 
                      question = "codebox",
@@ -113,7 +135,7 @@ current_state_report <- reactive({
                      correct = if (item$data$checked) item$data$feedback$correct else FALSE,
                      attempts = 999
       )
-    } else {
+    } else { # exercise submission
     tibble::tibble(id=item$id, 
                    question  = substr(item$data$question, 0, 20),
                    answer=item$data$answer,
@@ -122,27 +144,35 @@ current_state_report <- reactive({
                    attempts = length(item$data$history)/2
                   )
     }
-  })
+  }
+  For_report <- lapply(state_objs, condense) %>%
+    dplyr::bind_rows()
   
-  For_report <- dplyr::bind_rows(For_report) 
-  #save(For_report, shiny_object_names, file="~/Downloads/objects.rda")
-  For_report %>% dplyr::full_join(shiny_object_names) %>%
+  if (exists("document_roster")) {
+    For_report <- For_report %>% 
+      dplyr::full_join(document_roster, by = "id")
+  }
+
+  For_report %>% 
     mutate(document = etude2::etude_document_name()) %>%
     arrange(id)
+  
 })
 output$current_answers <- renderTable({current_state_report()})
 output$hash_output <- renderText({
+   paste(names(input), collapse="\n")
   # Logic to convert this to a CSV
   zz <- textConnection("forcsv", "w")
-  write.csv(na.omit(current_state_report()), 
+  write.csv(na.omit(current_state_report()),
             file=zz, row.names = FALSE)
   close(zz)
-  
+
   learnrhash::encode_obj(paste(forcsv, collapse="\n"))
-})
+
+ })
 ```
 
-```{r state, ech=FALSE}
+```{r state, echo=FALSE}
 shiny::actionButton("get_state", "Refresh summary of responses")
 learnrhash:::wrapped_verbatim_text_output("hash_output", TRUE)
 shiny::tableOutput("current_answers")
