@@ -18,7 +18,7 @@ library(gradethis)
 library(etude2)
 ```
 
-```{r context="setup", include=FALSE, eval=FALSE}
+```{r context="setup", include=FALSE}
 # Good practice to include these in any document bringing
 # with the answer submission system
 etude2::master_id("DD22")
@@ -111,7 +111,8 @@ etudeQ("Which ones are vowels?",
 
 ## Hand in
 
-This is the answer submission logic
+This is the answer submission logic. Include a section like this *only* 
+in top-level documents, not in individual problem files.
 
 
 ```{r context="server"}
@@ -149,6 +150,7 @@ current_state_report <- reactive({
     dplyr::bind_rows()
   
   if (exists("document_roster")) {
+    cat("Roster exists\n")
     For_report <- For_report %>% 
       dplyr::full_join(document_roster, by = "id")
   }
