@@ -1,0 +1,156 @@
+---
+title: "First example"
+output: learnr::tutorial
+runtime: shiny_prerendered
+params:
+  id: dog-leap-hose
+---
+
+```{r dog-leap-house-setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+learnr::tutorial_options(exercise.timelimit = 60, 
+                 exercise.checker = gradethis::grade_learnr)
+etude2::master_id("DD22")
+etude2::etude_document_name("DD22")
+```
+
+```{r context="setup", include=FALSE}
+library(etude2)
+library(learnr)
+library(gradethis)
+```
+
+## Exercises
+
+```{t ex1, exercise=TRUE}
+2 + 2
+```
+
+```{r ex1-check}
+grade_result(
+  pass_if(~ .result == 19)
+)
+```
+
+```{r ex3, exercise = TRUE, exercise.cap="Foofoo"}
+3 + 4
+paste("boo", "bah")
+19
+```
+
+```{r ex3-check}
+grade_result(
+  pass_if(~ .result == 19)
+)
+```
+
+## Questions
+
+I don't need a special type for text entry. I just have to set the `incorrect` argument to `NULL` and give something sensible for the `try_again_button`. BUT, I DO HAVE TO CHANGE IT TO A textAreaInput() in the initialization code.
+
+```{r textentry, eval=FALSE}
+#question_text("What do you think about this?", answer("nice", correct=TRUE), allow_retry=TRUE, incorrect=NULL, try_again_button = "Edit answer.", placeholder = "Write a nice essay, please!")
+```
+
+
+```{r first-question}
+etudeEssay("What do you think about this?",
+           placeholder = "Write a nice answer")
+```
+
+
+```{r from_etude}
+etudeEssay("What do you have to say about the electoral college?")
+```
+
+```{r aquiz, echo=FALSE}
+etudeQ("How much?", 1:4, right_one=3, id="DD31:17", allow_retry=TRUE)
+```
+
+```{r bquiz}
+etudeQ("Now how much?", 3:6, right_one=3, allow_retry=TRUE)
+```
+
+```{r multiple, echo=FALSE}
+etudeQ("Which ones?", "+A+", "B", "C", "D", "+E+", allow_retry = TRUE,
+       allow_multiple_correct = TRUE)
+```
+
+```{r multiple2, echo=FALSE}
+etudeQ("Which ones are vowels?", 
+       "+A+", 
+       "B" = "B is a consonant.\n", 
+       "C"="C is another consonant\n", 
+       "D"="D is still another\n", 
+       "+E+", 
+       allow_retry = TRUE,
+       allow_multiple_correct = TRUE)
+```
+
+## Hand in
+
+```{r}
+etude2::master_id_list()
+```
+
+
+```{r context="server"}
+current_state <- shiny::eventReactive(input$get_state, {
+  All <- learnr:::get_objects(session)
+  objs = learnr:::get_all_state_objects(session)
+  
+  objs = learnr:::submissions_from_state_objects(objs)
+  return(objs)
+})
+current_state_report <- reactive({
+  shiny_object_names <- tibble(id = etude2::master_id_list())
+  For_report <- lapply(current_state(), function(item) {
+    if (item$type == "exercise_submission") {
+      tibble::tibble(id = item$id, 
+                     question = "codebox",
+                     answer = item$data$code,
+                     time = as.character(Sys.time()), 
+                     correct = if (item$data$checked) item$data$feedback$correct else FALSE,
+                     attempts = 999
+      )
+    } else {
+    tibble::tibble(id=item$id, 
+                   question  = substr(item$data$question, 0, 20),
+                   answer=item$data$answer,
+                   time = as.character(item$data$time),
+                   correct = item$data$correct,
+                   attempts = length(item$data$history)/2
+                  )
+    }
+  })
+  
+  For_report <- dplyr::bind_rows(For_report) 
+  #save(For_report, shiny_object_names, file="~/Downloads/objects.rda")
+  For_report %>% dplyr::full_join(shiny_object_names) %>%
+    mutate(document = etude2::etude_document_name()) %>%
+    arrange(id)
+})
+output$current_answers <- renderTable({current_state_report()})
+output$hash_output <- renderText({
+  # Logic to convert this to a CSV
+  zz <- textConnection("forcsv", "w")
+  write.csv(na.omit(current_state_report()), 
+            file=zz, row.names = FALSE)
+  close(zz)
+  
+  learnrhash::encode_obj(paste(forcsv, collapse="\n"))
+})
+```
+
+```{r state, ech=FALSE}
+shiny::actionButton("get_state", "Refresh summary of responses")
+learnrhash:::wrapped_verbatim_text_output("hash_output", TRUE)
+shiny::tableOutput("current_answers")
+```
+
+
+
+
+
+`r params$id`
+

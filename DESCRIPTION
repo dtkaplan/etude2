@@ -1,0 +1,16 @@
+Package: etude2
+Type: Package
+Title: Second generation of etude project
+Version: 0.1.0
+Author: Daniel Kaplan
+Maintainer: Daniel Kaplan <dtkaplan@gmail.com>
+Description: Organizes files and questions in learnr tutorials.
+License: All rights reserved
+Encoding: UTF-8
+LazyData: true
+Depends: dplyr,glue
+Suggests: 
+    learnr,
+    gradethis,
+    testthat
+RoxygenNote: 7.1.0
