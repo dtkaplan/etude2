@@ -10,8 +10,8 @@ etudeQ <- function(prompt="The question prompt", ..., id=NULL,
                    allow_retry=TRUE,
                    correct = "Right!",
                    incorrect = "Sorry.",
-                   message = "I'm the message!",
-                   post_message = "Post message here.",
+                   message = NULL, # message after any response
+                   post_message = NULL, # message after correct response
                    submit_button = "Check answer",
                    try_again_button = "Try again",
                    allow_multiple_correct = FALSE,
@@ -110,10 +110,10 @@ etudeEssay <- function(prompt = "Give a prompt, please.", id=NULL,
   id <- master_id()
   result <- question_text(prompt, answer("nice", correct=TRUE),
                           allow_retry=TRUE, incorrect=NULL,
-                          submit_button = glue("Store your essay (ID:{id})"),
-                          try_again_button = glue("Edit essay (ID:{id})"),
+                          submit_button = glue("Store your response (ID:{id})"),
+                          try_again_button = glue("Edit response (ID:{id})"),
                           placeholder = placeholder,
-                          options = list(id = id, nrows=nrows))
+                          options = list(id = id, nrows = nrows, essay=TRUE))
 
   result$label <- paste0(clean_id(id), "-", result$label)
   etude2::master_id_list(result$label)

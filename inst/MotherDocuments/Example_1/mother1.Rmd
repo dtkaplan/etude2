@@ -1,0 +1,212 @@
+---
+title: "An `{etude2}` Mother document"
+output: learnr::tutorial
+runtime: shiny_prerendered
+params:
+  id: mother1
+---
+
+This is an example of a "mother" document using `{etude2}`. Mother documents are those that:
+
+1. Provide the submission widgets and logic for providing a report of a student's progress.
+2. Cache the student's process (typically in the browser) using the `{learnr}` mechanism and recover the state when the session is renewed. (This means that students should not share a browser, unless they are working as an intended group.)
+3. Optionally transclude `{etude2}` child documents, which are `{learnr}` documents *without* the submission widgets and logic. Such child documents are generally fully fledged `{learnr}` documents that can be compiled and run on their own. Note that mother documents should not be transcluded in other mother documents (as of this writing).
+
+The next chunk sets up the `{gradethis}` system to work with the mother document. This is needed *only* if you are not transcluding a child document that does this for you. If you are mixing tutorial material that's contained directly in the mother document (as opposed to being transcluded from an `{etude2}` child) or material in a `{learnr}` document that doesn't use `{etude2}`, be careful that the `learnr::tutorial_options()` are set appropriately in this document.
+
+```{r mother1-setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+learnr::tutorial_options(exercise.timelimit = 60, 
+                 exercise.checker = gradethis::grade_learnr)
+```
+
+The following chunk loads key libraries for the system. The chunk is in `context="setup"` so that these libraries are available both at compile time of the document and at run time.
+
+```{r context="setup", include=FALSE}
+### Boilerplate: always include these packages
+library(learnr)
+library(gradethis)
+library(etude2)
+```
+
+In order for transcluded `{learnr}` "questions" to be associated with this document, the `master_id()` and `etude_document_name()` are set. The first prepends the id to the name/label/id of any question created with `etudeQ()` or `etudeEssay()` (and `{etude2}` functions later on, should they be created)
+
+The `document_roster` This can only be constructed after the document is complete
+You can get the names from the first column of the submission
+table (after you have made an entry for each item)
+The purpose here is to show the student a complete list of all
+of the questions in the document, so they can see at a glance what
+they are missing.
+
+If `document_roster` isn't here, the submission table will not include questions for which no answers has been submitted. This isn't a disaster, but it can be nice for the scoring summary to show a student what has not yet been done. 
+
+On the other hand, if question names are included in the roster without a matching question in the document, unnecessary lines will be added to the scoring summary which might cause fruitless searching by the student for those items.
+
+```{r context="setup", include=FALSE}
+# Good practice to include these in any document bringing
+# with the answer submission system
+etude2::master_id("M1")
+etude2::etude_document_name("Mother1")
+
+# 
+document_roster <- tibble::tribble(
+  ~ id,
+"DD22-3-aquiz", "DD22-4-bquiz", "DD22-1-first-question",
+"DD22-2-from_etude", "DD22-5-multiple", "DD22-6-multiple2",
+"ex1","ex3"
+)
+```
+
+
+
+## Questions
+
+```{r first-question}
+etudeEssay("What do you think about this?",
+           placeholder = "Write a nice answer")
+```
+
+
+```{r from_etude}
+etudeEssay("What do you have to say about the electoral college?")
+```
+
+```{r aquiz}
+etudeQ("How much?", 1:4, right_one=3, id="DD31:17", allow_retry=TRUE)
+```
+
+```{r bquiz}
+etudeQ("Now how much?", 3:6, right_one=3, allow_retry=TRUE)
+```
+
+```{r multiple}
+etudeQ("Which ones?", "+A+", "B", "C", "D", "+E+", allow_retry = TRUE,
+       allow_multiple_correct = TRUE)
+```
+
+```{r multiple2}
+etudeQ("Which ones are vowels?", 
+       "+A+", 
+       "B" = "B is a consonant.\n", 
+       "C"="C is another consonant\n", 
+       "D"="D is still another\n", 
+       "+E+", 
+       allow_retry = TRUE,
+       allow_multiple_correct = TRUE)
+```
+
+
+
+## Exercises
+
+Regretably, `{learnr}` exercises are not yet integrated into the `{etude2}` naming system. Their names appear as the raw chunk names, for instance `ex1` and `ex3` here.
+
+```{t ex1, exercise=TRUE}
+2 + 2
+```
+
+```{r ex1-check}
+grade_result(
+  pass_if(~ .result == 19)
+)
+```
+
+```{r ex3, exercise = TRUE, exercise.cap="Foofoo"}
+3 + 4
+paste("boo", "bah")
+19
+```
+
+```{r ex3-check}
+grade_result(
+  pass_if(~ .result == 19)
+)
+```
+
+
+## Hand in
+
+This is the answer submission logic. Include a section like this *only* 
+in mother documents, not in individual problem files.
+
+
+```{r context="server"}
+current_state <- shiny::eventReactive(input$get_state, {
+  All <- learnr:::get_objects(session)
+  objs = learnr:::get_all_state_objects(session)
+  objs = learnr:::submissions_from_state_objects(objs)
+  
+  return(objs)
+})
+current_state_report <- reactive({
+  state_objs <- current_state()
+  save(state_objs, file = "~/Downloads/state.rda") # for debugging/development
+  if (length(state_objs) == 0) return(
+    tibble(message="No submissions yet"))
+  condense <- function(item) {
+    if (item$type == "exercise_submission") {
+      tibble::tibble(id = item$id, 
+                     question = "codebox",
+                     answer = item$data$code,
+                     time = as.character(Sys.time()), 
+                     correct = if (item$data$checked) item$data$feedback$correct else FALSE,
+                     attempts = 999,
+                     history=NA
+      )
+    } else { # exercise submission
+      tibble::tibble(id=item$id, 
+                     question  = substr(item$data$question, 0, 20),
+                     answer=item$data$answer,
+                     time = as.character(item$data$time),
+                     correct = ifelse(item$data$is_essay, 
+                                      NA, item$data$correct),
+                     attempts = length(item$data$history)/2,
+                     history = paste0(unlist(item$data$history),collapse=":::")
+      )
+    }
+  }
+  For_report <- lapply(state_objs, condense) %>%
+    dplyr::bind_rows()
+  
+  if (exists("document_roster")) {
+    For_report <- For_report %>% 
+      dplyr::full_join(document_roster, by = "id")
+  }
+
+  For_report %>% 
+    mutate(document = etude2::etude_document_name()) %>%
+    arrange(id)
+  
+})
+output$current_answers <- renderTable({
+  current_state_report() %>%
+    select(-history)})
+output$hash_output <- renderText({
+   paste(names(input), collapse="\n")
+  # # Logic to convert this to a CSV
+  # zz <- textConnection("forcsv", "w")
+  # write.csv(current_state_report() %>% filter(!is.na(answer)),
+  #           file=zz, row.names = FALSE)
+  # close(zz)
+  # 
+  # learnrhash::encode_obj(paste(forcsv, collapse="\n"))
+  
+  # Encode the data frame (as opposed to the CSV encoding commented
+  # out above.)
+  learnrhash::encode_obj(current_state_report() %>% (filter(!is.na(answer))))
+
+ })
+```
+
+```{r state, echo=FALSE}
+shiny::actionButton("get_state", "Refresh summary of responses")
+learnrhash:::wrapped_verbatim_text_output("hash_output", TRUE)
+shiny::tableOutput("current_answers")
+```
+
+
+
+
+
+`r params$id`
+
