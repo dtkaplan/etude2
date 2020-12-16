@@ -12,5 +12,6 @@ Depends: dplyr,glue
 Suggests: 
     learnr,
     gradethis,
-    testthat
+    testthat,
+    learnrhash
 RoxygenNote: 7.1.0

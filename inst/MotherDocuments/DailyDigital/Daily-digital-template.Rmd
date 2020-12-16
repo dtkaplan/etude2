@@ -1,0 +1,78 @@
+---
+title: "Daily Digital XXX"
+subtitle: "Math 142Z"
+date: "Due MMM DD YYYY"
+output: learnr::tutorial
+runtime: shiny_prerendered
+tutorial:
+  version: 0.1
+tags:
+- vectors
+---
+
+
+```{r mother1-setup, include=FALSE}
+# Calculus/graphics/data packages
+library(mosaic)
+library(mosaicCalc)
+library(ggformula)
+library(math141Z)
+library(MMAC)
+library(orthopolynom)
+library(DT)
+knitr::opts_chunk$set(echo = FALSE)
+learnr::tutorial_options(exercise.timelimit = 60, 
+                 exercise.checker = gradethis::grade_learnr)
+```
+
+
+```{r context="setup", include=FALSE}
+### Boilerplate: Packages relating to `{learnr}` and 
+### submission functionality.
+library(learnr)
+library(gradethis)
+library(etude2)
+library(learnrhash)
+```
+
+
+
+```{r context="setup", include=FALSE}
+# Good practice to include these in any document bringing
+# with the answer submission system
+etude2::master_id("DD-") # Add the DD number
+etude2::etude_document_name("DD-y") # Add the DD number
+# Fill this data frame in when document is completed. See etude2 documentation
+document_roster <- tibble::tribble(
+  ~ id,
+)
+# Leave this safety check here
+if (etude2::etude_document_name() == "DD-") 
+  stop("You must set the master_id() and the document name specifically and uniquely for this document")
+```
+
+Anything that appears above the first section marker will be displayed on each page.
+
+## Section 1
+
+You can simply delete all of this text
+
+## Section 2
+
+You can delete this line, BUT NOT ANYTHING AFTER.
+
+
+## Hand in your work
+
+PRESS THE REFRESH BUTTON before copying the hash code and submitting it at the [USAFA Math 142Z site](https://forms.microsoft.com/Pages/ResponsePage.aspx?id=Bgq4einwwEWE0X2tGc48YcCKijCKVrhDla481YPh1UJUMVdERUtVT0VOSEpMMEdPQU1aWlpYTTA0RS4u)
+
+
+```{r child=system.file("submission-handler.Rmd", package="etude2")}
+
+```
+
+
+-----
+
+Location: `r knitr::current_input(dir = TRUE)` `r etude2::etude_document_name("Mother1")`
+
