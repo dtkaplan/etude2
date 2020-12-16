@@ -1,0 +1,74 @@
+```{r context="server"}
+current_state <- shiny::eventReactive(input$get_state, {
+  All <- learnr:::get_objects(session)
+  objs = learnr:::get_all_state_objects(session)
+  objs = learnr:::submissions_from_state_objects(objs)
+
+  return(objs)
+})
+current_state_report <- reactive({
+  state_objs <- current_state()
+  save(state_objs, file = "~/Downloads/state.rda") # for debugging/development
+  if (length(state_objs) == 0) return(
+    tibble(message="No submissions yet"))
+  condense <- function(item) {
+    if (item$type == "exercise_submission") {
+      tibble::tibble(id = item$id,
+                     question = "codebox",
+                     answer = item$data$code,
+                     time = as.character(Sys.time()),
+                     correct = if (item$data$checked) item$data$feedback$correct else FALSE,
+                     attempts = 999,
+                     history=NA
+      )
+    } else { # exercise submission
+      tibble::tibble(id=item$id,
+                     question  = substr(item$data$question, 0, 20),
+                     answer=item$data$answer,
+                     time = as.character(item$data$time),
+                     correct = ifelse(item$data$is_essay,
+                                      NA, item$data$correct),
+                     attempts = length(item$data$history)/2,
+                     history = paste0(unlist(item$data$history),collapse=":::")
+      )
+    }
+  }
+  For_report <- lapply(state_objs, condense) %>%
+    dplyr::bind_rows()
+
+  if (exists("document_roster")) {
+    For_report <- For_report %>%
+      dplyr::full_join(document_roster, by = "id")
+  }
+
+  For_report %>%
+    mutate(document = etude2::etude_document_name()) %>%
+    arrange(id)
+
+})
+output$current_answers <- renderTable({
+  current_state_report() %>%
+    select(-history)})
+output$hash_output <- renderText({
+   paste(names(input), collapse="\n")
+  # # Logic to convert this to a CSV
+  # zz <- textConnection("forcsv", "w")
+  # write.csv(current_state_report() %>% filter(!is.na(answer)),
+  #           file=zz, row.names = FALSE)
+  # close(zz)
+  #
+  # learnrhash::encode_obj(paste(forcsv, collapse="\n"))
+
+  # Encode the data frame (as opposed to the CSV encoding commented
+  # out above.)
+  learnrhash::encode_obj(current_state_report() %>% (filter(!is.na(answer))))
+
+ })
+```
+
+```{r state, echo=FALSE}
+shiny::actionButton("get_state", "Refresh summary of responses")
+learnrhash:::wrapped_verbatim_text_output("hash_output", TRUE)
+shiny::tableOutput("current_answers")
+```
+
