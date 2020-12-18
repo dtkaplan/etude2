@@ -9,10 +9,11 @@ License: All rights reserved
 Encoding: UTF-8
 LazyData: true
 Depends: dplyr,glue
+Imports: glue, tibble
 Suggests: 
     learnr,
     gradethis,
     testthat,
     learnrhash,
     magrittr
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1

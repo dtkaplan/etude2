@@ -6,6 +6,7 @@
 #'
 #' @importFrom glue glue
 #' @importFrom magrittr `%>%`
+#' @importFrom tibble tibble
 #'
 #' @export
 etudeQ <- function(prompt="The question prompt", ..., id=NULL,
@@ -24,8 +25,8 @@ etudeQ <- function(prompt="The question prompt", ..., id=NULL,
   # id <- paste0(master_id(),"-", id)
   id <- master_id()
 
-  submit_button <- glue("{submit_button} (ID: {id})")
-  try_again_button <- glue("{try_again_button} (ID: {id})")
+  submit_button <- glue::glue("{submit_button} (ID: {id})")
+  try_again_button <- glue::glue("{try_again_button} (ID: {id})")
   answer_table <- etude2:::dots_to_answers(..., right_one = right_one,
                   allow_multiple_correct = allow_multiple_correct)
 
