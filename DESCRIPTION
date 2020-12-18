@@ -13,5 +13,6 @@ Suggests:
     learnr,
     gradethis,
     testthat,
-    learnrhash
+    learnrhash,
+    magrittr
 RoxygenNote: 7.1.0

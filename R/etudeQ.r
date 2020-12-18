@@ -3,6 +3,10 @@
 #' This is an interface to learnr::question() to allow pre- and post-processing
 #' of the question object
 #'
+#'
+#' @importFrom glue glue
+#' @importFrom magrittr `%>%`
+#'
 #' @export
 etudeQ <- function(prompt="The question prompt", ..., id=NULL,
                    right_one=NULL,

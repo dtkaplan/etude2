@@ -1,0 +1,49 @@
+---
+title: "Integral of the day: TEMPLATE"
+date: "MMM DD YYYY"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+knitr::opts_chunk$set(echo = FALSE)
+learnr::tutorial_options(exercise.timelimit = 60, 
+                 exercise.checker = gradethis::grade_learnr)
+```
+
+```{r context="setup"}
+# Note use of double \\ for latex in quotation marks
+problemLatex <- "\\int_1^x \\frac{1}{x} dx"
+answer_fun <- function(x) log(x)
+library(magrittr)
+```
+
+Find:     <div style="font-size: 40px; text-align:center;">$`r problemLatex`$ </div>
+
+ 
+
+Your answer should always be in the form of an R *function* of the correct variable (and any other variables that happen to be in involved). Represent numerical constants that have explicit values as numerals. Constants that are given only symbolically (e.g. $a_0$) can be left as symbols (using `_` for any subscripts, e.g. `a_0`).
+
+```{r IoD23, exercise=TRUE, exercise.lines=5, exercise.cap="Integral of the Day"}
+function(x) {
+  log(x)
+}
+```
+
+```{r IoD23-check}
+correct_arguments <- c("x")
+evaluate_at <- 1:10
+gradethis::grade_result(
+  fail_if( ~ !is.function(.result), message = "Your result should be in the form of a function."),
+  fail_if( ~ !all(c("x") %in% names(formals(.result))),
+           message = "You don't seem to have all the right argument names."),
+  
+  pass_if( ~ all(.result(evaluate_at) ==
+                          answer_fun(evaluate_at))),
+  fail_if( ~ TRUE, message="Correct arguments, but not the right function.")
+)  
+```
+
+

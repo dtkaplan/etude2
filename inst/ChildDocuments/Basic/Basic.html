@@ -13,7 +13,7 @@
 <meta name="progressive" content="false" />
 <meta name="allow-skip" content="false" />
 
-<title>Daily Digital XXX</title>
+<title>Basic etude2 child document</title>
 
 
 <!-- highlightjs -->
@@ -116,32 +116,33 @@ $(document).ready(function () {
 
 <div class="topics">
 
-<p>Anything that appears above the first section marker will be displayed on each page.</p>
-<div id="section-section-1" class="section level2">
-<h2>Section 1</h2>
-<p>You can simply delete all of this text</p>
+<div class="panel panel-default">
+<div data-label="one" class="tutorial-question panel-body">
+<div id="one-answer_container" class="shiny-html-output"></div>
+<div id="one-message_container" class="shiny-html-output"></div>
+<div id="one-action_button_container" class="shiny-html-output"></div>
+<script>if (Tutorial.triggerMathJax) Tutorial.triggerMathJax()</script>
 </div>
-<div id="section-section-2" class="section level2">
-<h2>Section 2</h2>
-<p>You can delete this line, BUT NOT ANYTHING AFTER.</p>
 </div>
-<div id="section-hand-in-your-work" class="section level2">
-<h2>Hand in your work</h2>
-<p>PRESS THE REFRESH BUTTON before copying the hash code and submitting it at the <a href="https://forms.microsoft.com/Pages/ResponsePage.aspx?id=Bgq4einwwEWE0X2tGc48YcCKijCKVrhDla481YPh1UJUMVdERUtVT0VOSEpMMEdPQU1aWlpYTTA0RS4u">USAFA Math 142Z site</a></p>
-<p><button id="get_state" type="button" class="btn btn-default action-button">Refresh summary of responses</button><pre id="hash_output" class="shiny-text-output" style="white-space: pre-wrap;"></pre><div id="current_answers" class="shiny-html-output"></div></p>
-<hr />
-<p>Location: /Users/kaplan/KaplanFiles/Packages/etude2/inst/MotherDocuments/DailyDigital/Daily-digital-template.Rmd</p>
-
+<div class="panel panel-default">
+<div data-label="two" class="tutorial-question panel-body">
+<div id="two-answer_container" class="shiny-html-output"></div>
+<div id="two-message_container" class="shiny-html-output"></div>
+<div id="two-action_button_container" class="shiny-html-output"></div>
+<script>if (Tutorial.triggerMathJax) Tutorial.triggerMathJax()</script>
+</div>
+</div> 
 <script type="application/shiny-prerendered" data-context="server-start">
-### Boilerplate: Packages relating to `{learnr}` and 
-### submission functionality.
 library(learnr)
 library(gradethis)
 library(etude2)
+knitr::opts_chunk$set(echo = FALSE)
+learnr::tutorial_options(exercise.timelimit = 60,
+                 exercise.checker = gradethis::grade_learnr)
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
-learnr:::register_http_handlers(session, metadata = list(version = 0.1))
+learnr:::register_http_handlers(session, metadata = NULL)
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
@@ -154,88 +155,24 @@ session$onSessionEnded(function() {
       })
 </script>
  
-<script type="application/shiny-prerendered" data-context="server-start">
-# Good practice to include these in any document bringing
-# with the answer submission system
-etude2::master_id("DD-") # Add the DD number
-etude2::etude_document_name("DD-y") # Add the DD number
-# Fill this data frame in when document is completed. See etude2 documentation
-document_roster <- tibble::tribble(
-  ~ id,
-)
-# Leave this safety check here
-if (etude2::etude_document_name() == "DD-") 
-  stop("You must set the master_id() and the document name specifically and uniquely for this document")
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::store_exercise_setup_chunk("__setup__", c("library(learnr)", "library(gradethis)", "library(etude2)", "knitr::opts_chunk$set(echo = FALSE)", "learnr::tutorial_options(exercise.timelimit = 60,", "                 exercise.checker = gradethis::grade_learnr)"), overwrite = FALSE)
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
-current_state <- shiny::eventReactive(input$get_state, {
-  All <- learnr:::get_objects(session)
-  objs = learnr:::get_all_state_objects(session)
-  objs = learnr:::submissions_from_state_objects(objs)
-
-  return(objs)
-})
-current_state_report <- reactive({
-  state_objs <- current_state()
-  #save(state_objs, file = "~/Downloads/state.rda") # for debugging/development
-  if (length(state_objs) == 0) return(
-    tibble(message="No submissions yet"))
-  condense <- function(item) {
-    if (item$type == "exercise_submission") {
-      tibble::tibble(id = item$id,
-                     question = "codebox",
-                     answer = item$data$code,
-                     time = as.character(Sys.time()),
-                     correct = if (item$data$checked) item$data$feedback$correct else FALSE,
-                     attempts = 999,
-                     history=NA
-      )
-    } else { # exercise submission
-      tibble::tibble(id=item$id,
-                     question  = substr(item$data$question, 0, 20),
-                     answer=item$data$answer,
-                     time = as.character(item$data$time),
-                     correct = ifelse(item$data$is_essay,
-                                      NA, item$data$correct),
-                     attempts = length(item$data$history)/2,
-                     history = paste0(unlist(item$data$history),collapse=":::")
-      )
-    }
-  }
-  For_report <- lapply(state_objs, condense) %>%
-    dplyr::bind_rows()
-
-  if (exists("document_roster")) {
-    For_report <- For_report %>%
-      dplyr::full_join(document_roster, by = "id")
-  }
-
-  For_report %>%
-    mutate(document = etude2::etude_document_name()) %>%
-    arrange(id)
-
-})
-output$current_answers <- renderTable({
-  current_state_report() %>%
-    select(-history)})
-output$hash_output <- renderText({
-   paste(names(input), collapse="\n")
-  # # Logic to convert this to a CSV
-  # zz <- textConnection("forcsv", "w")
-  # write.csv(current_state_report() %>% filter(!is.na(answer)),
-  #           file=zz, row.names = FALSE)
-  # close(zz)
-  #
-  # learnrhash::encode_obj(paste(forcsv, collapse="\n"))
-
-  # Encode the data frame (as opposed to the CSV encoding commented
-  # out above.)
- current_state_report() %>% 
-   filter(!is.na(answer)) %>%
-    learnrhash::encode_obj()
+learnr:::store_exercise_setup_chunk("__setup__", c("library(learnr)", "library(gradethis)", "library(etude2)", "knitr::opts_chunk$set(echo = FALSE)", "learnr::tutorial_options(exercise.timelimit = 60,", "                 exercise.checker = gradethis::grade_learnr)"), overwrite = FALSE)
+</script>
  
-})
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::store_exercise_setup_chunk("__setup__", c("library(learnr)", "library(gradethis)", "library(etude2)", "knitr::opts_chunk$set(echo = FALSE)", "learnr::tutorial_options(exercise.timelimit = 60,", "                 exercise.checker = gradethis::grade_learnr)"), overwrite = FALSE)
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "tmp-1-one", question = structure("Which of these is a food?", html = TRUE, class = c("html", "character")), answers = list(structure(list(id = "lnr_ans_7f63889",     option = "Airplane", value = "Airplane", label = structure("Airplane", html = TRUE, class = c("html",     "character")), correct = FALSE, message = structure("", html = TRUE, class = c("html",     "character"))), class = c("tutorial_question_answer", "tutorial_quiz_answer")), structure(list(id = "lnr_ans_9594ac9", option = "Banana",     value = "Banana", label = structure("Banana", html = TRUE, class = c("html",     "character")), correct = TRUE, message = structure("", html = TRUE, class = c("html",     "character"))), class = c("tutorial_question_answer", "tutorial_quiz_answer")), structure(list(id = "lnr_ans_461db5f", option = "Car", value = "Car",     label = structure("Car", html = TRUE, class = c("html", "character"    )), correct = FALSE, message = structure("", html = TRUE, class = c("html",     "character"))), class = c("tutorial_question_answer", "tutorial_quiz_answer")), structure(list(id = "lnr_ans_8d116e0", option = "Detroit",     value = "Detroit", label = structure("Detroit", html = TRUE, class = c("html",     "character")), correct = FALSE, message = structure("", html = TRUE, class = c("html",     "character"))), class = c("tutorial_question_answer", "tutorial_quiz_answer"))), button_labels = list(submit = structure("Check answer (ID: tmp-1)", html = TRUE, class = c("html", "character")), try_again = structure("Try again (ID: tmp-1)", html = TRUE, class = c("html", "character"))), messages = list(correct = structure("Right!", html = TRUE, class = c("html", "character")), try_again = structure("Sorry.", html = TRUE, class = c("html", "character")), incorrect = structure("Sorry.", html = TRUE, class = c("html", "character")), message = NULL, post_message = NULL), ids = list(    answer = "one-answer", question = "one"), loading = structure("<strong>Loading:<\u002fstrong> \nWhich of these is a food?\n<br/><br/><br/>", html = TRUE, class = c("html", "character")), random_answer_order = FALSE, allow_retry = TRUE,     seed = 1020753874.02467, options = list(id = "tmp-1")), class = c("learnr_radio", "tutorial_question")))
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "tmp-2-two", question = structure("Which of these is an animal?", html = TRUE, class = c("html", "character")), answers = list(structure(list(id = "lnr_ans_6eacd5c",     option = "Argentina", value = "Argentina", label = structure("Argentina", html = TRUE, class = c("html",     "character")), correct = FALSE, message = structure("", html = TRUE, class = c("html",     "character"))), class = c("tutorial_question_answer", "tutorial_quiz_answer")), structure(list(id = "lnr_ans_29799fa", option = "Beaver",     value = "Beaver", label = structure("Beaver", html = TRUE, class = c("html",     "character")), correct = TRUE, message = structure("", html = TRUE, class = c("html",     "character"))), class = c("tutorial_question_answer", "tutorial_quiz_answer")), structure(list(id = "lnr_ans_f1168f6", option = "Columbia",     value = "Columbia", label = structure("Columbia", html = TRUE, class = c("html",     "character")), correct = FALSE, message = structure("", html = TRUE, class = c("html",     "character"))), class = c("tutorial_question_answer", "tutorial_quiz_answer")), structure(list(id = "lnr_ans_428422a", option = "Delaware",     value = "Delaware", label = structure("Delaware", html = TRUE, class = c("html",     "character")), correct = FALSE, message = structure("", html = TRUE, class = c("html",     "character"))), class = c("tutorial_question_answer", "tutorial_quiz_answer"))), button_labels = list(submit = structure("Check answer (ID: tmp-2)", html = TRUE, class = c("html", "character")), try_again = structure("Try again (ID: tmp-2)", html = TRUE, class = c("html", "character"))), messages = list(correct = structure("Right!", html = TRUE, class = c("html", "character")), try_again = structure("Sorry.", html = TRUE, class = c("html", "character")), incorrect = structure("Sorry.", html = TRUE, class = c("html", "character")), message = NULL, post_message = NULL), ids = list(    answer = "two-answer", question = "two"), loading = structure("<strong>Loading:<\u002fstrong> \nWhich of these is an animal?\n<br/><br/><br/>", html = TRUE, class = c("html", "character")), random_answer_order = FALSE, allow_retry = TRUE,     seed = 1782077117.67016, options = list(id = "tmp-2")), class = c("learnr_radio", "tutorial_question")))
 </script>
  <!--html_preserve-->
 <script type="application/shiny-prerendered" data-context="dependencies">
@@ -244,10 +181,9 @@ output$hash_output <- renderText({
 <!--/html_preserve-->
 <!--html_preserve-->
 <script type="application/shiny-prerendered" data-context="execution_dependencies">
-{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92]}},"value":[{"type":"character","attributes":{},"value":["backports","base","broom","checkmate","colorspace","compiler","crayon","crosstalk","curl","data.table","datasets","digest","dplyr","ellipsis","etude2","evaluate","farver","fastmap","generics","ggdendro","ggforce","ggformula","ggplot2","ggrepel","ggridges","ggstance","glue","gradethis","graphics","grDevices","grid","gridExtra","gtable","hms","htmltools","htmlwidgets","httpuv","httr","jsonlite","knitr","later","lattice","lazyeval","leaflet","learnr","learnrhash","lifecycle","lubridate","magrittr","markdown","MASS","math141Z","Matrix","methods","metR","mime","mosaic","mosaicCalc","mosaicCore","mosaicData","munsell","pillar","pkgconfig","plotly","plyr","polyclip","promises","purrr","R6","Rcpp","readr","rlang","rmarkdown","rprojroot","scales","shiny","splines","stats","stringi","stringr","tibble","tidyr","tidyselect","tools","tweenr","utils","vctrs","viridisLite","withr","xfun","xtable","yaml"]},{"type":"character","attributes":{},"value":["1.1.10","3.6.3","0.7.1","2.0.0","1.4-1","3.6.3","1.3.4.9000","1.1.0.1","4.3","1.12.8","3.6.3","0.6.25","1.0.2","0.3.1","0.1.0","0.14","2.0.3","1.0.1","0.0.2","0.1.22","0.3.2","0.9.4","3.3.2","0.8.2","0.5.2","0.3.4","1.4.2","0.1.0.9002","3.6.3","3.6.3","3.6.3","2.3","0.3.0","0.5.3","0.5.0","1.5.2","1.5.4","1.4.2","1.7.1","1.30","1.1.0.1","0.20-38","0.2.2","2.0.3","0.10.1.9004","0.1.0.9000","0.2.0","1.7.9","1.5","1.1","7.3-51.5","0.2.0","1.2-18","3.6.3","0.7.0","0.9","1.8.2","0.5.2.9000","0.8.0","0.20.1","0.5.0","1.4.6","2.0.3","4.9.2.1","1.8.6","1.10-0","1.1.1","0.3.4","2.4.1","1.0.5","1.4.0","0.4.8","2.4","1.3-2","1.1.1","1.5.0","3.6.3","3.6.3","1.5.3","1.4.0","3.0.3","1.1.2","1.1.0","3.6.3","1.0.1","3.6.3","0.3.4","0.3.0","2.3.0","0.18","1.8-4","2.2.1"]}]}]}
+{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52]}},"value":[{"type":"character","attributes":{},"value":["backports","base","checkmate","compiler","crayon","curl","datasets","digest","dplyr","ellipsis","etude2","evaluate","fastmap","generics","glue","gradethis","graphics","grDevices","htmltools","htmlwidgets","httpuv","jsonlite","knitr","later","learnr","lifecycle","magrittr","markdown","methods","mime","pillar","pkgconfig","promises","purrr","R6","Rcpp","rlang","rmarkdown","rprojroot","shiny","stats","stringi","stringr","tibble","tidyselect","tools","utils","vctrs","withr","xfun","xtable","yaml"]},{"type":"character","attributes":{},"value":["1.1.10","3.6.3","2.0.0","3.6.3","1.3.4.9000","4.3","3.6.3","0.6.25","1.0.2","0.3.1","0.1.0","0.14","1.0.1","0.0.2","1.4.2","0.1.0.9002","3.6.3","3.6.3","0.5.0","1.5.2","1.5.4","1.7.1","1.30","1.1.0.1","0.10.1.9004","0.2.0","1.5","1.1","3.6.3","0.9","1.4.6","2.0.3","1.1.1","0.3.4","2.4.1","1.0.5","0.4.8","2.4","1.3-2","1.5.0","3.6.3","1.5.3","1.4.0","3.0.3","1.1.0","3.6.3","3.6.3","0.3.4","2.3.0","0.18","1.8-4","2.2.1"]}]}]}
 </script>
 <!--/html_preserve-->
-</div>
 
 </div> <!-- topics -->
 
@@ -258,9 +194,8 @@ output$hash_output <- renderText({
 
 <!-- begin doc-metadata -->
 <div id="doc-metadata">
-<h2 class="title toc-ignore" style="display:none;">Daily Digital XXX</h2>
-<h3 class="subtitle"><em>Math 142Z</em></h3>
-<h4 class="date"><em>Due MMM DD YYYY</em></h4>
+<h2 class="title toc-ignore" style="display:none;">Basic etude2 child document</h2>
+<h4 class="date"><em>MMM DD YYYY</em></h4>
 </div>
 <!-- end doc-metadata -->
 

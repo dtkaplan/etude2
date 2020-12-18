@@ -8,7 +8,10 @@ current_state <- shiny::eventReactive(input$get_state, {
 })
 current_state_report <- reactive({
   state_objs <- current_state()
-  #save(state_objs, file = "~/Downloads/state.rda") # for debugging/development
+  
+  # comment out before deployment
+  save(state_objs, file = "~/Downloads/state.rda") # for debugging/development
+  
   if (length(state_objs) == 0) return(
     tibble(message="No submissions yet"))
   condense <- function(item) {
@@ -42,13 +45,13 @@ current_state_report <- reactive({
   }
 
   For_report %>%
-    mutate(document = etude2::etude_document_name()) %>%
-    arrange(id)
+    dplyr::mutate(document = etude2::etude_document_name()) %>%
+    dplyr::arrange(id)
 
 })
 output$current_answers <- renderTable({
   current_state_report() %>%
-    select(-history)})
+    dplyr::select(-history)})
 output$hash_output <- renderText({
    paste(names(input), collapse="\n")
   # # Logic to convert this to a CSV
@@ -62,7 +65,7 @@ output$hash_output <- renderText({
   # Encode the data frame (as opposed to the CSV encoding commented
   # out above.)
  current_state_report() %>% 
-   filter(!is.na(answer)) %>%
+   dplyr::filter(!is.na(answer)) %>%
     learnrhash::encode_obj()
  
 })

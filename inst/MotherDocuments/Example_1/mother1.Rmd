@@ -57,7 +57,12 @@ document_roster <- tibble::tribble(
 )
 ```
 
+## Using etude2 child documents
 
+
+```{r child=file.path("/Users/kaplan/KaplanFiles/Packages/etude2/inst/ChildDocuments", "Basic/Basic.Rmd")}
+
+```
 
 ## Questions
 
@@ -101,6 +106,8 @@ etudeQ("Which ones are vowels?",
 
 Regretably, `{learnr}` exercises are not yet integrated into the `{etude2}` naming system. Their names appear as the raw chunk names, for instance `ex1` and `ex3` here.
 
+
+
 ```{t ex1, exercise=TRUE}
 2 + 2
 ```
@@ -122,6 +129,7 @@ grade_result(
   pass_if(~ .result == 19)
 )
 ```
+
 
 
 ## Hand in

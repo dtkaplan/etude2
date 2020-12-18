@@ -17,9 +17,6 @@ library(mosaic)
 library(mosaicCalc)
 library(ggformula)
 library(math141Z)
-library(MMAC)
-library(orthopolynom)
-library(DT)
 knitr::opts_chunk$set(echo = FALSE)
 learnr::tutorial_options(exercise.timelimit = 60, 
                  exercise.checker = gradethis::grade_learnr)
@@ -32,7 +29,6 @@ learnr::tutorial_options(exercise.timelimit = 60,
 library(learnr)
 library(gradethis)
 library(etude2)
-library(learnrhash)
 ```
 
 

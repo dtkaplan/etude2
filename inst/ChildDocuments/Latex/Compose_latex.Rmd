@@ -1,0 +1,65 @@
+---
+title: "Compose Latex Math"
+date: "MMM DD YYYY"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+library(etude2)
+library(shiny)
+knitr::opts_chunk$set(echo = FALSE)
+learnr::tutorial_options(exercise.timelimit = 60,
+                 exercise.checker = gradethis::grade_learnr)
+```
+
+
+
+
+```{r echo=FALSE}
+render_latex_ui <- function(id){
+HTML(glue::glue('<div style="font-size: 25px;">
+  <div id={NS(id, "prompt")} class="shiny-html-output"></div>
+</div>
+<hr/>
+<div style="font-size: 25px;">
+  <div class="form-group shiny-input-container">
+    <label class="control-label" for="latex">Type latex math here.</label>
+    <textarea id={NS(id, "latex")} class="form-control" rows="5" cols="50" style="font-size: 25px"></textarea>
+  </div>
+</div>
+<div id={NS(id, "rendered")} class="shiny-html-output" style="font-size:25px;"></div>
+<div id={NS(id, "feedback")} class="shiny-html-output" style="color: green; font-size:30px;"></div>'))
+}
+
+
+```
+
+```{r}
+render_latex_ui("one")
+```
+
+```{r context="server"}
+id <- "one"
+answers <- c("\\int_a^b x^2 dx", "\\int^b_a x^2 dx") 
+squash_str <- "\\{|\\}| |\t|\n"
+
+output[[NS(id, "rendered")]] <- renderUI({
+  withMathJax(paste0("$$", input[[NS(id, "latex")]], "$$"))
+})
+output[[NS(id, "prompt")]] <- renderUI({
+  withMathJax(paste0("Typeset this: $$",answers[1],"$$"))
+})
+output[[NS(id, "feedback")]] <- renderUI({
+  compare <- gsub(squash_str, "", answers)
+  if (gsub(squash_str, "", 
+           input[[NS(id, "latex")]]) %in% compare) "Success!"
+  else "Not yet"
+})
+
+
+```
+
+
