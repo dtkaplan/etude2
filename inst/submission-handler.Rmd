@@ -10,7 +10,7 @@ current_state_report <- reactive({
   state_objs <- current_state()
   
   # comment out before deployment
-  save(state_objs, file = "~/Downloads/state.rda") # for debugging/development
+  # save(state_objs, file = "~/Downloads/state.rda") # for debugging/development
   
   if (length(state_objs) == 0) return(
     tibble(message="No submissions yet"))
