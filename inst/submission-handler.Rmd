@@ -7,6 +7,7 @@ shiny_state <- shiny::eventReactive(input$get_state, {
   # get the state from etude2_app_registration
   res <- list()
   nms <- names(etude2_app_registration)
+  if (length(nms) == 0) return(NULL)
   for (k in 1:length(nms)) {
     res[[k]] <- etude2_app_registration[[nms[k]]]
   }
@@ -54,7 +55,8 @@ current_state_report <- reactive({
   For_report <- lapply(state_objs, condense) %>%
     dplyr::bind_rows()
   
-  For_report <- bind_rows(For_report, app_results)
+  if (!is.null(app_results))
+    For_report <- bind_rows(For_report, app_results)
  
 
   if (exists("document_roster")) {
