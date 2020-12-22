@@ -1,4 +1,19 @@
 ```{r context="server"}
+if (!exists("etude2_app_registration")) 
+  etude2_app_registration <- reactiveValues()
+
+
+shiny_state <- shiny::eventReactive(input$get_state, {
+  # get the state from etude2_app_registration
+  res <- list()
+  nms <- names(etude2_app_registration)
+  for (k in 1:length(nms)) {
+    res[[k]] <- etude2_app_registration[[nms[k]]]
+  }
+  # save(res, file="~/Downloads/res.rda")
+  dplyr::bind_rows(res)
+})
+
 current_state <- shiny::eventReactive(input$get_state, {
   All <- learnr:::get_objects(session)
   objs = learnr:::get_all_state_objects(session)
@@ -8,7 +23,7 @@ current_state <- shiny::eventReactive(input$get_state, {
 })
 current_state_report <- reactive({
   state_objs <- current_state()
-  
+  app_results <- shiny_state()
   # comment out before deployment
   # save(state_objs, file = "~/Downloads/state.rda") # for debugging/development
   
@@ -38,6 +53,9 @@ current_state_report <- reactive({
   }
   For_report <- lapply(state_objs, condense) %>%
     dplyr::bind_rows()
+  
+  For_report <- bind_rows(For_report, app_results)
+ 
 
   if (exists("document_roster")) {
     For_report <- For_report %>%
@@ -64,9 +82,12 @@ output$hash_output <- renderText({
 
   # Encode the data frame (as opposed to the CSV encoding commented
   # out above.)
- current_state_report() %>% 
+ Res <- current_state_report() %>% 
    dplyr::filter(!is.na(answer)) %>%
     learnrhash::encode_obj()
+ 
+
+ Res
  
 })
 ```

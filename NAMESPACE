@@ -3,6 +3,7 @@
 export(etudeEssay)
 export(etudeQ)
 export(etude_document_name)
+export(latex_entry_box)
 export(master_id)
 export(master_id_list)
 importFrom(glue,glue)
