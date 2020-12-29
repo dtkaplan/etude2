@@ -72,7 +72,7 @@ QuizServer <-  function(input, output, session, questions = Sinusoids(),
   lead <- reactiveVal("What do you want me to do?")
   current_choices <- reactiveVal(NULL)
   sequence <- reactive({
-    sample(DailyDocuments::make_sequence(nrow(questions), 100))
+    sample(etude2::make_sequence(nrow(questions), 100))
   })
 
   observeEvent(input$next_question, {
