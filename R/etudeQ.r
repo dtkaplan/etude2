@@ -21,9 +21,13 @@ etudeQ <- function(prompt="The question prompt", ..., id=NULL,
                    try_again_button = "Try again",
                    allow_multiple_correct = FALSE,
                    is_learnr = TRUE) {
+  id <- master_id()
+
+
+
   # if (is.null(id)) stop("etudeQ must be given <id> argument")
   # id <- paste0(master_id(),"-", id)
-  id <- master_id()
+
 
   submit_button <- glue::glue("{submit_button} (ID: {id})")
   try_again_button <- glue::glue("{try_again_button} (ID: {id})")
@@ -49,6 +53,19 @@ etudeQ <- function(prompt="The question prompt", ..., id=NULL,
                     message = message,
                     post_message = post_message,
                     random_answer_order = random_answer_order)
+  # Check whether  return out a markdown text version of the question rather
+  # than a learnr/shiny version
+  if (static_knitr_format()) {
+    qtext <- glue::glue("::: {{.etude-question}}\n\n**Question {id}**: {prompt}\n\n")
+    for (k in 1:nrow(answer_table)) {
+      marker <- ifelse(answer_table$correct[k], "  (($\\surd$)
+  )", "")
+      new <- glue::glue("#. {answer_table$item[k]}{marker} [{answer_table$feedback[k]}]")
+      qtext <- paste(qtext, new, sep="\n\n")
+    }
+    return(knitr::asis_output(paste0(qtext, "\n\n:::\n\n")))
+  }
+
   result <- do.call(learnr::question, arguments)
   result$options <- list(id = id)
   result$label <- paste0(clean_id(id), "-", result$label)
@@ -60,6 +77,14 @@ etudeQ <- function(prompt="The question prompt", ..., id=NULL,
 
   result
 }
+
+#' Figure out if the function is being called from knitr with runtime static
+#' (that is, not a learnr document)
+static_knitr_format <- function() {
+  is_static <- knitr::opts_knit$get("rmarkdown.runtime")
+  is.null(is_static) || is_static == "static"
+}
+
 
 # return a data frame with one row for each element of ...
 dots_to_answers <- function(..., right_one = "",
@@ -113,7 +138,13 @@ etudeEssay <- function(prompt = "Give a prompt, please.", id=NULL,
   # if (is.null(id)) stop("etudeEssay must be given <id> argument")
   # id <- paste0(master_id(),"-", id)
   id <- master_id()
-  result <- question_text(prompt, answer("nice", correct=TRUE),
+  # Check whether  return out a markdown text version of the question rather
+  # than a learnr/shiny version
+  if (static_knitr_format()) {
+    qtext <- glue::glue("::: {{.etude-question}}\n\n**Essay question {id}**: {prompt}\n\n:::\n\n")
+    return(knitr::asis_output(qtext))
+  }
+  result <- learnr::question_text(prompt, answer("nice", correct=TRUE),
                           allow_retry=TRUE, incorrect=NULL,
                           submit_button = glue("Store your response (ID:{id})"),
                           try_again_button = glue("Edit response (ID:{id})"),
