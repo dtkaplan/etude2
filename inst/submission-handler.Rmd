@@ -1,16 +1,9 @@
 ```{r context="server"}
-if (!exists("etude2_app_registration")) 
-  etude2_app_registration <- reactiveValues()
-
-
 shiny_state <- shiny::eventReactive(input$get_state, {
-  # get the state from etude2_app_registration
+  # get the state from etude2_app_registration1
   res <- list()
-  nms <- names(etude2_app_registration)
-  if (length(nms) == 0) return(NULL)
-  for (k in 1:length(nms)) {
-    res[[k]] <- etude2_app_registration[[nms[k]]]
-  }
+  res[[1]] <- etude2_app_registration1()
+  
   # save(res, file="~/Downloads/res.rda")
   dplyr::bind_rows(res)
 })
@@ -25,11 +18,11 @@ current_state <- shiny::eventReactive(input$get_state, {
 current_state_report <- reactive({
   state_objs <- current_state()
   app_results <- shiny_state()
-  # comment out before deployment
-  # save(state_objs, file = "~/Downloads/state.rda") # for debugging/development
   
-  if (length(state_objs) == 0) return(
-    tibble(message="No submissions yet"))
+  
+  if (length(state_objs) == 0 && !inherits(app_results, "data.frame")) { 
+    return(tibble(message="No submissions yet"))
+  }
   condense <- function(item) {
     if (item$type == "exercise_submission") {
       tibble::tibble(id = item$id,
@@ -55,7 +48,7 @@ current_state_report <- reactive({
   For_report <- lapply(state_objs, condense) %>%
     dplyr::bind_rows()
   
-  if (!is.null(app_results))
+  if (inherits(app_results, "data.frame"))
     For_report <- bind_rows(For_report, app_results)
  
 

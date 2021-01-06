@@ -48,8 +48,7 @@ make_sequence <- function(nchoices, n = 20) {
 
 
 QuizServer <-  function(input, output, session, questions = Sinusoids(),
-                        label = "drill4", state_register = NULL) {
-
+                        label = "drill4", recorder) {
   observeEvent(input$start_over, {
     correct_answer() # blank it out
     current_feedback() # blank it out
@@ -129,8 +128,7 @@ QuizServer <-  function(input, output, session, questions = Sinusoids(),
   })
 
   observeEvent(n_answered(), {
-    if (!is.null(state_register)) {
-      state_register[[label]] <-
+        quiz_state <-
         tibble::tibble(id = label,
                        question = "drill",
                        answer = paste(n_correct(), "/", n_answered()),
@@ -138,7 +136,7 @@ QuizServer <-  function(input, output, session, questions = Sinusoids(),
                        correct = n_answered() > 10 && n_correct() >= 0.8*n_answered(),
                        attempts = 1,
                        history = "")
-    }
+    recorder(quiz_state)
   })
   output$prompt_lead <- renderText(HTML(lead()))
   output$choice_buttons <- renderUI({
