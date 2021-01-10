@@ -133,7 +133,7 @@ QuizServer <-  function(input, output, session, questions = Sinusoids(),
                        question = "drill",
                        answer = paste(n_correct(), "/", n_answered()),
                        time = as.character(Sys.time()),
-                       correct = n_answered() > 10 && n_correct() >= 0.8*n_answered(),
+                       correct = n_answered() >= 10 && n_correct() >= 0.8*n_answered(),
                        attempts = 1,
                        history = "")
     recorder(quiz_state)

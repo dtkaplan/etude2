@@ -33,7 +33,7 @@ current_state_report <- reactive({
                      attempts = 999,
                      history=NA
       )
-    } else { # exercise submission
+    } else { # question submission
       tibble::tibble(id=item$id,
                      question  = substr(item$data$question, 0, 20),
                      answer=item$data$answer,
