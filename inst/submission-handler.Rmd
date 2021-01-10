@@ -28,7 +28,7 @@ current_state_report <- reactive({
       tibble::tibble(id = item$id,
                      question = "codebox",
                      answer = item$data$code,
-                     time = as.character(Sys.time()),
+                     time = format(Sys.time(), tz="GMT", usetz=TRUE),
                      correct = if (item$data$checked) item$data$feedback$correct else FALSE,
                      attempts = 999,
                      history=NA
@@ -37,7 +37,7 @@ current_state_report <- reactive({
       tibble::tibble(id=item$id,
                      question  = substr(item$data$question, 0, 20),
                      answer=item$data$answer,
-                     time = as.character(item$data$time),
+                     time = format(item$data$time, tz="GMT", usetz=TRUE),
                      correct = ifelse(item$data$is_essay,
                                       NA, item$data$correct),
                      attempts = length(item$data$history)/2,
@@ -45,6 +45,7 @@ current_state_report <- reactive({
       )
     }
   }
+  
   For_report <- lapply(state_objs, condense) %>%
     dplyr::bind_rows()
   
