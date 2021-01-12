@@ -3,7 +3,8 @@ shiny_state <- shiny::eventReactive(input$get_state, {
   # get the state from etude2_app_registration1
   res <- list()
   res[[1]] <- etude2_app_registration1()
-  
+  res[[2]] <- etude2_app_registration2()
+  res[[3]] <- etude2_app_registration3()
   # save(res, file="~/Downloads/res.rda")
   dplyr::bind_rows(res)
 })
@@ -12,14 +13,23 @@ current_state <- shiny::eventReactive(input$get_state, {
   All <- learnr:::get_objects(session)
   objs = learnr:::get_all_state_objects(session)
   objs = learnr:::submissions_from_state_objects(objs)
-
-  return(objs)
+# Discard sandboxes without checking
+  keepers <- rep(TRUE, length(objs))
+  for(k in 1:length(objs)) {
+    if (objs[[k]]$type == "exercise_submission") {
+      if (!objs[[k]]$data$checked) {
+        keepers[k] <- FALSE
+      }
+    }
+  }
+  
+  return(objs[keepers])
 })
 current_state_report <- reactive({
   state_objs <- current_state()
   app_results <- shiny_state()
   
-  
+  save(state_objs, app_results, file="~/Downloads/state.rda")
   if (length(state_objs) == 0 && !inherits(app_results, "data.frame")) { 
     return(tibble(message="No submissions yet"))
   }
@@ -66,18 +76,11 @@ current_state_report <- reactive({
 output$current_answers <- renderTable({
   current_state_report() %>%
     dplyr::select(-history)})
+
+
 output$hash_output <- renderText({
    paste(names(input), collapse="\n")
-  # # Logic to convert this to a CSV
-  # zz <- textConnection("forcsv", "w")
-  # write.csv(current_state_report() %>% filter(!is.na(answer)),
-  #           file=zz, row.names = FALSE)
-  # close(zz)
-  #
-  # learnrhash::encode_obj(paste(forcsv, collapse="\n"))
-
-  # Encode the data frame (as opposed to the CSV encoding commented
-  # out above.)
+  
  Res <- current_state_report() %>% 
    dplyr::filter(!is.na(answer)) %>%
     learnrhash::encode_obj()
