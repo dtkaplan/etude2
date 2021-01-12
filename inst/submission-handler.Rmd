@@ -1,21 +1,12 @@
 ```{r context="server"}
-#if (!exists(apps_state) apps_state <- reactiveValues()
+library(learnr, quietly = TRUE)
+library(gradethis, quietly = TRUE)
+library(etude2, quietly = TRUE)
+library(learnrhash, quietly = TRUE)
+
+if (!exists(apps_state)) apps_state <- reactiveValues()
 
 shiny_state <- shiny::eventReactive(input$get_state, {
-  # get the state from etude2_app_registration1
-  # cat("Setting up app state\n")
-  # app_state$one <- head(mtcars, 1)
-  # app_state$two <- tail(mtcars, 1)
-  # cat("Set up ... now try to concatenate")
-  # foo <- 
-  # cat("Successful concatentation\n")
-    
-  # res <- list()
-  # res[[1]] <- etude2_app_registration1()
-  # res[[2]] <- etude2_app_registration2()
-  # res[[3]] <- etude2_app_registration3()
-  # save(res, file="~/Downloads/res.rda")
-  #dplyr::bind_rows(res)
   dplyr::bind_rows(reactiveValuesToList(apps_state))
 })
 

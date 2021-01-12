@@ -136,7 +136,7 @@ QuizServer <-  function(input, output, session, questions = Sinusoids(),
                        correct = n_answered() >= 10 && n_correct() >= 0.8*n_answered(),
                        attempts = 1,
                        history = "")
-    recorder[[label]] <- quiz_state
+        if (n_answered() > 0) recorder[[label]] <- quiz_state
   })
   output$prompt_lead <- renderText(HTML(lead()))
   output$choice_buttons <- renderUI({

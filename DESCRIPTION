@@ -8,12 +8,11 @@ Description: Organizes files and questions in learnr tutorials.
 License: All rights reserved
 Encoding: UTF-8
 LazyData: true
-Depends: dplyr,glue
+Depends: dplyr,glue, learnrhash
 Imports: glue, tibble
 Suggests: 
     learnr,
     gradethis,
     testthat,
-    learnrhash,
     magrittr
 RoxygenNote: 7.1.1
