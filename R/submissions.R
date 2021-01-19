@@ -51,19 +51,27 @@ submissions_logic <- function() {
       state_objs <- current_state()
       app_results <- shiny_state()
 
-      # save(state_objs, app_results, file="~/Downloads/state.rda")
+      #save(state_objs, app_results, file="~/Downloads/state.rda")
       if (length(state_objs) == 0 && nrow(shiny_state()) == 0) {
         return(tibble(message = "No submissions yet", history=1))
       }
       condense <- function(item) {
         if (item$type == "exercise_submission") {
+          # handle situation when there is no feedback, e.g. the
+          # code in the submission generated an error at parse time
+          feedback <- if ("correct" %in% names(item$data$feedback)) {
+            item$data$feedback$correct
+          }else {
+            FALSE
+          }
+
           tibble::tibble(id = item$id,
                          question = "codebox",
                          answer = item$data$code,
                          time = format(Sys.time(), tz="GMT", usetz=TRUE),
-                         correct = if (item$data$checked) item$data$feedback$correct else FALSE,
+                         correct = if (item$data$checked) feedback else FALSE,
                          attempts = 999,
-                         history=NA
+                         history=""
           )
         } else { # question submission
           tibble::tibble(id=item$id,
