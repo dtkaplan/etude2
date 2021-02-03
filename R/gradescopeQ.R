@@ -1,7 +1,7 @@
 #' Render multiple choice questions for GradeScope online assignment
 #'
 #'
-#' @example
+#' @examples
 #' foo <- gradescopeQ("What is $$\\int x^2 dx \\mbox{?}$$",
 #'            "+an indefinite integral+" = "That's all I wanted.",
 #'            "Something I don't understand" = "Keep studying",
@@ -38,7 +38,7 @@ gradescopeQ <- function(prompt="The question prompt", ...,
 
   total <- paste(out, answers, feedback, sep="\n\n")
 
-  total
+  knitr::asis_output(paste0("<pre>", total, "\n</pre>\n"))
   }
 
 fix_dollar_signs <- function(str) {

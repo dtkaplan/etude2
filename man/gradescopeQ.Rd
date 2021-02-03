@@ -24,3 +24,10 @@ gradescopeQ(
 \description{
 Render multiple choice questions for GradeScope online assignment
 }
+\examples{
+foo <- gradescopeQ("What is $$\\\\int x^2 dx \\\\mbox{?}$$",
+           "+an indefinite integral+" = "That's all I wanted.",
+           "Something I don't understand" = "Keep studying",
+           "a definite integral" = "No, there are no limits of integration as in $\\\\int_a^b$."
+           )
+}
