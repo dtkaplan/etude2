@@ -22,6 +22,7 @@ gradescopeQ <- function(prompt="The question prompt", ...,
                         try_again_button = "Try again", # not used
                         allow_multiple_correct = FALSE) {
 
+  id <- master_id()
   answer_table <- etude2:::dots_to_answers(..., right_one = right_one,
                                            allow_multiple_correct = allow_multiple_correct)
 
@@ -38,7 +39,7 @@ gradescopeQ <- function(prompt="The question prompt", ...,
 
   total <- paste(out, answers, feedback, sep="\n\n")
 
-  knitr::asis_output(paste0("<pre>", total, "\n</pre>\n"))
+  knitr::asis_output(paste0("<pre>", "[Question ", id, "]  ", total, "\n</pre>\n"))
   }
 
 fix_dollar_signs <- function(str) {

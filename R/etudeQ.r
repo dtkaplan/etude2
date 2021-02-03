@@ -75,7 +75,7 @@ etudeQ <- function(prompt="The question prompt", ..., id=NULL,
   if (!is_learnr)
     result <- paste(capture.output(result), collapse="\n")
 
-  cat(result)
+  result
 }
 
 #' Figure out if the function is being called from knitr with runtime static
