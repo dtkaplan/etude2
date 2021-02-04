@@ -36,7 +36,7 @@ library(etude2)
 ```{r context="setup", include=FALSE}
 # Good practice to include these in any document bringing
 # with the answer submission system
-etude2::master_id("DD-") # Add the DD number
+etude2::set_master_id("DD-") # Add the DD number
 etude2::etude_document_name("DD-y") # Add the DD number
 # Fill this data frame in when document is completed. See etude2 documentation
 document_roster <- tibble::tribble(

@@ -21,12 +21,14 @@ etudeQ <- function(prompt="The question prompt", ..., id=NULL,
                    try_again_button = "Try again",
                    allow_multiple_correct = FALSE,
                    is_learnr = TRUE) {
-  id <- master_id()
 
+    if (exists("gradescope") && gradescope) {
+      the_args <- as.list(match.call())[-1]
+      the_args$id <- question_id(id)
+      return(do.call(gradescopeQ, the_args))
+    }
 
-
-  # if (is.null(id)) stop("etudeQ must be given <id> argument")
-  # id <- paste0(master_id(),"-", id)
+    id <- question_id(id)
 
 
   submit_button <- glue::glue("{submit_button} (ID: {id})")
@@ -58,8 +60,7 @@ etudeQ <- function(prompt="The question prompt", ..., id=NULL,
   if (static_knitr_format()) {
     qtext <- glue::glue("::: {{.etude-question}}\n\n**Question {id}**: {prompt}\n\n")
     for (k in 1:nrow(answer_table)) {
-      marker <- ifelse(answer_table$correct[k], "  (($\\surd$)
-  )", "")
+      marker <- ifelse(answer_table$correct[k], "  (+)", "")
       new <- glue::glue("#. {answer_table$item[k]}{marker} [{answer_table$feedback[k]}]")
       qtext <- paste(qtext, new, sep="\n\n")
     }
@@ -137,9 +138,14 @@ etudeEssay <- function(prompt = "Give a prompt, please.", id=NULL,
                        nrows = 5, placeholder="Your essay here ...") {
   # if (is.null(id)) stop("etudeEssay must be given <id> argument")
   # id <- paste0(master_id(),"-", id)
-  id <- master_id()
+  id <- question_id(id)
   # Check whether  return out a markdown text version of the question rather
   # than a learnr/shiny version
+  if (exists("gradescope") && gradescope) {
+    prompt <- fix_dollar_signs(prompt)
+    res <- paste0("[ID ", id, "]  ", prompt)
+    return(knitr::asis_output(paste0("<pre>", res, "</pre>")))
+  }
   if (static_knitr_format()) {
     qtext <- glue::glue("::: {{.etude-question}}\n\n**Essay question {id}**: {prompt}\n\n:::\n\n")
     return(knitr::asis_output(qtext))
@@ -171,17 +177,23 @@ etude_store$document_name <- ""
 #' when questions are created with etude2 they will
 #' get assigned a unique ID within the document
 #' @export
-master_id <- function(id) {
-  if (missing(id)) {
-    etude_store$id_count <- etude_store$id_count + 1
-    res <-
-      if ("master_id" %in% names(etude_store)) {
-        paste0(etude_store$master_id, "-", etude_store$id_count)
-      } else paste0("tmp", "-", etude_store$id_count)
-
-    return(res)
-  } else etude_store$master_id <- id
+set_master_id <- function(id) {
+    etude_store$master_id <- id
 }
+
+#' construct a document-specific ID for the question
+
+question_id <- function(id) {
+  doc_id <- etude_store$master_id
+  etude_store$id_count <- etude_store$id_count + 1
+  if (is.null(doc_id)) doc_id <- "tmp"
+  if (missing(id) || is.null(id)) {
+    return(paste0(doc_id, "-", etude_store$id_count))
+  } else {
+    return(paste0(doc_id, "-", id))
+  }
+}
+
 #' Get the list of question items in the current document
 #' @export
 master_id_list <- function(str) {

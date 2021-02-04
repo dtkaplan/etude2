@@ -21,7 +21,7 @@ library(etude2)
 ```{r context="setup", include=FALSE}
 # Good practice to include these in any document bringing
 # with the answer submission system
-etude2::master_id("DD22")
+etude2::set_master_id("DD22")
 etude2::etude_document_name("DD22")
 # This can only be constructed after the document is complete
 # You can get the names from the first column of the submission
@@ -124,7 +124,6 @@ current_state <- shiny::eventReactive(input$get_state, {
   return(objs)
 })
 current_state_report <- reactive({
-  #shiny_object_names <- tibble(id = etude2::master_id_list())
   state_objs <- current_state()
   if (length(state_objs) == 0) return(tibble(message="No submissions yet"))
   condense <- function(item) {

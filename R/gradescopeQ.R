@@ -8,7 +8,6 @@
 #'            "a definite integral" = "No, there are no limits of integration as in $\\int_a^b$."
 #'            )
 
-#' @export
 gradescopeQ <- function(prompt="The question prompt", ...,
                         id=NULL, # not used
                         right_one=NULL,
@@ -22,7 +21,6 @@ gradescopeQ <- function(prompt="The question prompt", ...,
                         try_again_button = "Try again", # not used
                         allow_multiple_correct = FALSE) {
 
-  id <- master_id()
   answer_table <- etude2:::dots_to_answers(..., right_one = right_one,
                                            allow_multiple_correct = allow_multiple_correct)
 

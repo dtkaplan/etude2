@@ -45,7 +45,7 @@ On the other hand, if question names are included in the roster without a matchi
 ```{r context="setup", include=FALSE}
 # Good practice to include these in any document bringing
 # with the answer submission system
-etude2::master_id("M1")
+etude2::set_master_id("M1")
 etude2::etude_document_name("Mother1")
 
 # 
