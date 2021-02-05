@@ -41,8 +41,9 @@ gradescopeQ <- function(prompt="The question prompt", ...,
   }
 
 fix_dollar_signs <- function(str) {
-  str <- gsub("\\${2}", "☹☹☹︎", str)
-  str <- gsub("\\${1}", "☹☹", str)
-  gsub("☹", "$", str)
+
+  str <- gsub("\\${2}", "︎@@@", str)
+  str <- gsub("\\${1}", "@", str)
+  gsub("@", "$", str)
 }
 
