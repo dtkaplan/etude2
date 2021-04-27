@@ -1,0 +1,60 @@
+---
+title: "Daily Digital"
+subtitle: "CalcZ"
+master_id: "DD47"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r include=FALSE, context="setup"}
+library(etude2)
+# Calculus/graphics/data packages
+library(mosaic)
+library(mosaicCalc)
+library(math141Z)
+library(DT)
+knitr::opts_chunk$set(echo = FALSE)
+learnr::tutorial_options(exercise.timelimit = 60,
+                 exercise.checker = gradethis::grade_learnr)
+# Good practice to include these in any document bringing
+# with the answer submission system
+etude2::set_master_id(rmarkdown::metadata$master_id) 
+etude2::etude_document_name(rmarkdown::metadata$master_id) 
+```
+
+## Objectives
+
+## Section 1
+
+` ```{r child="yourfile.Rmd"}
+
+
+## Section 2
+
+` ```{r child="yourfile.Rmd"}
+```
+
+## Hand in your work
+
+<div style="color: red;">USAFA CalcZ students should hand in their work via GradeScope</div>
+
+
+<!--
+
+REMEMBER: Press the REFRESH button before copying the hash code and submitting it at the <a href="https://forms.microsoft.com/Pages/ResponsePage.aspx?id=Bgq4einwwEWE0X2tGc48YcCKijCKVrhDla481YPh1UJUMVdERUtVT0VOSEpMMEdPQU1aWlpYTTA0RS4u" target = "_blank">USAFA Math 142Z site</a>
+
+
+```{rr echo=FALSE, messages=FALSE}
+etude2::submissions_ui()
+```
+
+```{rr context="server", echo=FALSE, messages=FALSE}
+etude2::submissions_logic()
+```
+
+-->
+
+-----
+
+Location: `r gsub("^.*USAFA/", "", knitr::current_input(dir = TRUE))` `r  etude2::etude_document_name()`
+
