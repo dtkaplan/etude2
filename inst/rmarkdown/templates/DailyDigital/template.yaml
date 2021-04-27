@@ -1,3 +1,3 @@
 name: Daily Digital
 description: "An online homework"
-create_dir: true
+create_dir: false
