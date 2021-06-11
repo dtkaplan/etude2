@@ -58,13 +58,13 @@ etudeQ <- function(prompt="The question prompt", ..., id=NULL,
   # Check whether  return out a markdown text version of the question rather
   # than a learnr/shiny version
   if (static_knitr_format()) {
-    qtext <- glue::glue("::: {{.etude-question}}\n\n**Question {id}**: {prompt}\n\n")
+    qtext <- glue::glue("\n\n**Question {id}**: {prompt}\n\n")
     for (k in 1:nrow(answer_table)) {
       marker <- ifelse(answer_table$correct[k], "  (+)", "")
       new <- glue::glue("#. {answer_table$item[k]}{marker} [{answer_table$feedback[k]}]")
       qtext <- paste(qtext, new, sep="\n\n")
     }
-    return(knitr::asis_output(paste0(qtext, "\n\n:::\n\n")))
+    return(knitr::asis_output(paste0(qtext, "\n\n\n\n")))
   }
 
   result <- do.call(learnr::question, arguments)
@@ -147,7 +147,7 @@ etudeEssay <- function(prompt = "Give a prompt, please.", id=NULL,
     return(knitr::asis_output(paste0("<pre>", res, "</pre>")))
   }
   if (static_knitr_format()) {
-    qtext <- glue::glue("::: {{.etude-question}}\n\n**Essay question {id}**: {prompt}\n\n:::\n\n")
+    qtext <- glue::glue("\n\n**Essay question {id}**: {prompt}\n\n")
     return(knitr::asis_output(qtext))
   }
   result <- learnr::question_text(prompt, answer("nice", correct=TRUE),
